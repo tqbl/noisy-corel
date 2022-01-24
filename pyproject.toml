@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "arca23k-baseline"
+name = "noisy-corel"
 version = "0.1.0"
-description = "The ARCA23K baseline system"
+description = "CoRel pseudolabelling system for audio classification"
 authors = ["Turab Iqbal <t.iqbal@surrey.ac.uk>"]
 license = "ISC"
 

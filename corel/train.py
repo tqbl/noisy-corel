@@ -30,6 +30,7 @@ def train(args):
     params = vars(args.params)
     json_params = dict(params)
     json_params['weights_path'] = str(params['weights_path'])
+    json_params['pseudolabel_path'] = str(params['pseudolabel_path'])
     pprint.pprint(json_params, sort_dicts=False)
     with open(log_dir / 'parameters.json', 'w') as f:
         json.dump(json_params, f, indent=2)
@@ -62,6 +63,8 @@ def parse_args():
     params.add_argument('--model', choices=['vgg9a', 'vgg11a', 'resnet18a'])
     params.add_argument('--weights_path', type=Path, metavar='PATH')
     params.add_argument('--label_noise', type=cli.dict, metavar='DICT')
+    params.add_argument('--pseudolabel_path', type=Path, metavar='PATH')
+    params.add_argument('--pseudolabel_params', type=cli.dict, metavar='SPEC')
     params.add_argument('--n_epochs', type=int, metavar='N')
     params.add_argument('--batch_size', type=int, metavar='N')
     params.add_argument('--lr', type=float, metavar='NUM')

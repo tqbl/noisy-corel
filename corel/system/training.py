@@ -5,7 +5,7 @@ from jaffalearn.data import DataLoaderFactory, MixedDataLoaderFactory
 
 import system.models as models
 import system.utils as utils
-from system import Baseline, LabelNoise
+from system import Baseline, LabelNoise, Relabeler
 
 
 def train(log_dir,
@@ -20,6 +20,8 @@ def train(log_dir,
           model='vgg11a',
           weights_path=None,
           label_noise=None,
+          pseudolabel_path=None,
+          pseudolabel_params=None,
           n_epochs=1,
           batch_size=1,
           lr=0.001,
@@ -57,6 +59,15 @@ def train(log_dir,
     elif weights_path is not None and weights_path.name:
         system.restore_state(torch.load(weights_path, map_location=device))
 
+    # Determine whether a custom 'labeler' should be used for training
+    labeler = None
+    if label_noise:
+        labeler = LabelNoise(**label_noise).relabeler(train_set)
+    if pseudolabel_path is not None and pseudolabel_path.name:
+        labeler = Relabeler(pseudolabel_path,
+                            **pseudolabel_params,
+                            target_fn=labeler)
+
     # Create data loaders for training and validation
     if partition:
         factory = MixedDataLoaderFactory(
@@ -78,8 +89,9 @@ def train(log_dir,
             cache_features=cache_features,
         )
     loader_val = factory.validation_data_loader(val_set)
-    if label_noise:
-        factory.labeler = LabelNoise(**label_noise).relabeler(train_set)
+    if labeler is not None:
+        # Use a different labeler for the training set
+        factory.labeler = labeler
     loader_train = factory.training_data_loader(train_set)
 
     print('\n', model, '\n', sep='')
